@@ -81,6 +81,7 @@ function showPartnerView(name, idType, id) {
   document.getElementById('bannerPartnerName').textContent = name;
   document.getElementById('bannerIdType').textContent = idType;
   document.getElementById('bannerId').textContent = id;
+  setActiveNav('navGrowth');
 
   renderOppView('copilot');
   setActiveOppTab('copilot');
@@ -91,7 +92,15 @@ function initBannerChange() {
   document.getElementById('bannerChange').addEventListener('click', () => {
     document.getElementById('partnerLoaded').classList.add('hidden');
     document.getElementById('freHomepage').classList.remove('hidden');
+    setActiveNav('navHome');
   });
+}
+
+// ── Sidebar nav highlight ──
+function setActiveNav(activeId) {
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  const el = document.getElementById(activeId);
+  if (el) el.classList.add('active');
 }
 
 // ── Opportunity tabs ──
