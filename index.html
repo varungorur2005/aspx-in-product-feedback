@@ -22,6 +22,18 @@
       <span class="nav-subtitle">Partner Experience – Internal</span>
     </div>
     <div class="nav-right">
+      <!-- Global persistent search (Links-style) -->
+      <div class="global-search" id="globalSearch">
+        <svg class="global-search-icon" width="15" height="15" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M8.5 3a5.5 5.5 0 0 1 4.383 8.823l4.147 4.147a.75.75 0 0 1-1.06 1.06l-4.147-4.147A5.5 5.5 0 1 1 8.5 3zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+        </svg>
+        <input type="text" id="globalSearchInput" class="global-search-input" placeholder="Search partners, tenants, or IDs…" autocomplete="off" />
+        <div class="global-loaded-chip hidden" id="globalLoadedChip">
+          <span id="globalChipName"></span>
+          <button class="global-chip-clear" id="globalChipClear" aria-label="Clear partner">✕</button>
+        </div>
+        <div class="search-dropdown hidden" id="globalSearchDropdown"></div>
+      </div>
       <button class="nav-help" title="Help & readiness">?</button>
       <div class="nav-avatar" title="Varun Gorur">VG</div>
     </div>
@@ -118,25 +130,20 @@
           </div>
         </div>
 
-        <!-- Hero Partner Picker -->
+        <!-- Hero Partner Picker — intelligent search -->
         <section class="hero-picker">
           <label class="hero-picker-label">Which partner are you working with?</label>
-          <div class="hero-picker-row">
-            <select id="idTypeDropdown" class="hero-dropdown">
-              <option value="partnerone">PartnerOne ID</option>
-              <option value="mpn">MPN ID</option>
-            </select>
-            <div class="hero-input-wrapper">
-              <svg class="hero-search-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M8.5 3a5.5 5.5 0 0 1 4.383 8.823l4.147 4.147a.75.75 0 0 1-1.06 1.06l-4.147-4.147A5.5 5.5 0 1 1 8.5 3zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
-              </svg>
-              <input type="text" id="searchInput" class="hero-input" placeholder="Enter PartnerOne ID (Limit one at a time)" />
-            </div>
-            <button class="hero-load-btn" id="loadPartnerBtn">Load Partner</button>
+          <div class="hero-search-box" id="heroSearchBox">
+            <svg class="hero-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M8.5 3a5.5 5.5 0 0 1 4.383 8.823l4.147 4.147a.75.75 0 0 1-1.06 1.06l-4.147-4.147A5.5 5.5 0 1 1 8.5 3zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+            </svg>
+            <input type="text" id="heroSearchInput" class="hero-search-input" placeholder="Search by partner name, tenant name, PartnerOne ID, MPN ID, or TPID…" autocomplete="off" />
+            <kbd class="hero-kbd">/</kbd>
+            <div class="search-dropdown hidden" id="heroSearchDropdown"></div>
           </div>
           <div class="hero-hint">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="#999"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 12.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM8 6.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 6.5zM8 4.5A.75.75 0 1 1 8 6a.75.75 0 0 1 0-1.5z"/></svg>
-            <span>One PartnerOne ID at a time, or multiple MPN IDs comma-separated (up to 200).</span>
+            <span>Type a name, ID, or TPID — we'll find the right partner for you.</span>
           </div>
         </section>
 
@@ -171,8 +178,18 @@
           <div class="section-heading-row">
             <h2 class="section-heading">My Partners</h2>
             <div class="partner-view-toggle">
+              <button class="toggle-btn" data-view="mpl">MPL</button>
               <button class="toggle-btn active" data-view="pinned">Pinned</button>
               <button class="toggle-btn" data-view="recent">Recent</button>
+            </div>
+          </div>
+
+          <!-- MPL (Managed Partner List) view — V1.5 placeholder -->
+          <div class="partner-view hidden" id="mplPartnersView">
+            <div class="placeholder-card">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#b3b3b3"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+              <p><strong>Managed Partner List</strong> — Your officially assigned partners from MPL will appear here automatically.</p>
+              <span class="placeholder-badge">Coming in V1.5</span>
             </div>
           </div>
 
@@ -302,6 +319,18 @@
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <!-- Recommended Actions — V2 placeholder -->
+        <section class="actions-placeholder">
+          <div class="section-heading-row">
+            <h2 class="section-heading">Recommended Actions</h2>
+            <span class="placeholder-badge">Coming in V2</span>
+          </div>
+          <div class="placeholder-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#b3b3b3"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+            <p><strong>Campaign-aware actions</strong> — Suggested next best actions based on active campaigns, partner signals, and opportunity data will appear here.</p>
           </div>
         </section>
 

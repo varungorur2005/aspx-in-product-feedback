@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   initGreeting();
-  initDropdown();
-  initPartnerLoad();
+  initSearch();
   initPartnerCards();
   initOppTabs();
   initBannerChange();
@@ -9,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPartnerViewToggle();
   initAlertActions();
   initPinButtons();
+  initKeyboardShortcut();
 });
 
 // ── Greeting ──
@@ -18,60 +18,223 @@ function initGreeting() {
   document.getElementById('greeting').textContent = `Good ${period}, Varun`;
 }
 
-// ── Dropdown placeholder toggle ──
-function initDropdown() {
-  const dropdown = document.getElementById('idTypeDropdown');
-  const input = document.getElementById('searchInput');
-  const placeholders = {
-    partnerone: 'Enter PartnerOne ID (Limit one at a time)',
-    mpn: 'Enter MPN ID (comma-separated, up to 200)'
-  };
-  dropdown.addEventListener('change', () => {
-    input.placeholder = placeholders[dropdown.value];
-    input.value = '';
-    input.focus();
+// ── Search data (simulated partner + tenant index) ──
+const searchIndex = [
+  { name: 'Contoso Partners', type: 'partner', id: '8834721', idType: 'PartnerOne ID', tenants: 47, initials: 'CP' },
+  { name: 'Fabrikam Inc.', type: 'partner', id: '4419283', idType: 'MPN ID', tenants: 22, initials: 'FI' },
+  { name: 'Woodgrove Bank', type: 'partner', id: '5512903', idType: 'PartnerOne ID', tenants: 31, initials: 'WB' },
+  { name: 'Adatum Corporation', type: 'partner', id: '7721054', idType: 'MPN ID', tenants: 15, initials: 'AC' },
+  { name: 'Lucerne Publishing', type: 'partner', id: '6630182', idType: 'PartnerOne ID', tenants: 9, initials: 'LP' },
+  { name: 'Datum Corp', type: 'partner', id: '3310247', idType: 'MPN ID', tenants: 38, initials: 'DC' },
+  { name: 'Contoso Ltd.', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-90412', initials: 'CL' },
+  { name: 'Northwind Traders', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-71823', initials: 'NT' },
+  { name: 'Adventure Works', type: 'tenant', parent: 'Fabrikam Inc.', parentId: '4419283', tpid: 'TPID-55091', initials: 'AW' },
+  { name: 'Alpine Ski House', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-62340', initials: 'AS' },
+  { name: 'Trey Research', type: 'tenant', parent: 'Fabrikam Inc.', parentId: '4419283', tpid: 'TPID-48712', initials: 'TR' },
+  { name: 'Relecloud Inc.', type: 'tenant', parent: 'Woodgrove Bank', parentId: '5512903', tpid: 'TPID-33901', initials: 'RI' },
+  { name: 'Bellows College', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-82156', initials: 'BC' },
+  { name: 'Fourth Coffee', type: 'tenant', parent: 'Adatum Corporation', parentId: '7721054', tpid: 'TPID-14509', initials: 'FC' },
+  { name: 'Litware Inc.', type: 'tenant', parent: 'Datum Corp', parentId: '3310247', tpid: 'TPID-67283', initials: 'LI' },
+  { name: 'Proseware Ltd.', type: 'tenant', parent: 'Lucerne Publishing', parentId: '6630182', tpid: 'TPID-20145', initials: 'PL' },
+];
+
+// ── Fuzzy search ──
+function searchEntities(query) {
+  if (!query || query.length < 2) return [];
+  const q = query.toLowerCase();
+  return searchIndex.filter(item => {
+    return item.name.toLowerCase().includes(q)
+      || item.id?.toLowerCase().includes(q)
+      || item.tpid?.toLowerCase().includes(q)
+      || item.parent?.toLowerCase().includes(q);
+  }).slice(0, 8);
+}
+
+// ── Highlight match ──
+function highlight(text, query) {
+  if (!query) return text;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return text;
+  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + query.length) + '</mark>' + text.slice(idx + query.length);
+}
+
+// ── Render dropdown ──
+function renderDropdown(dropdown, results, query) {
+  if (results.length === 0) {
+    dropdown.innerHTML = `<div class="search-empty">No results for "${query}"<br><span style="font-size:11px;color:#b3b3b3">Try a partner name, tenant name, or ID</span></div>`;
+    dropdown.classList.remove('hidden');
+    return;
+  }
+
+  const partners = results.filter(r => r.type === 'partner');
+  const tenants = results.filter(r => r.type === 'tenant');
+  let html = '';
+
+  if (partners.length) {
+    html += '<div class="search-group-label">Partners</div>';
+    partners.forEach(p => {
+      html += `<div class="search-result" data-type="partner" data-name="${p.name}" data-id="${p.id}" data-id-type="${p.idType}">
+        <div class="search-result-avatar partner">${p.initials}</div>
+        <div class="search-result-info">
+          <div class="search-result-name">${highlight(p.name, query)}</div>
+          <div class="search-result-meta">${p.idType}: ${p.id} · ${p.tenants} tenants</div>
+        </div>
+        <span class="search-result-badge partner">Partner</span>
+      </div>`;
+    });
+  }
+
+  if (tenants.length) {
+    html += '<div class="search-group-label">Tenants</div>';
+    tenants.forEach(t => {
+      html += `<div class="search-result" data-type="tenant" data-name="${t.parent}" data-id="${t.parentId}" data-id-type="PartnerOne ID" data-tenant="${t.name}">
+        <div class="search-result-avatar tenant">${t.initials}</div>
+        <div class="search-result-info">
+          <div class="search-result-name">${highlight(t.name, query)}</div>
+          <div class="search-result-meta">under ${t.parent} · ${t.tpid}</div>
+        </div>
+        <span class="search-result-badge tenant">Tenant</span>
+      </div>`;
+    });
+  }
+
+  html += `<div class="search-footer"><kbd>↑</kbd> <kbd>↓</kbd> to navigate · <kbd>Enter</kbd> to select · <kbd>Esc</kbd> to close</div>`;
+  dropdown.innerHTML = html;
+  dropdown.classList.remove('hidden');
+
+  // Wire click handlers
+  dropdown.querySelectorAll('.search-result').forEach(el => {
+    el.addEventListener('click', () => selectSearchResult(el));
   });
 }
 
-// ── Load partner from hero picker ──
-function initPartnerLoad() {
-  const btn = document.getElementById('loadPartnerBtn');
-  const input = document.getElementById('searchInput');
+// ── Select a search result ──
+function selectSearchResult(el) {
+  const name = el.dataset.name;
+  const id = el.dataset.id;
+  const idType = el.dataset.idType;
+  showPartnerView(name, idType, id);
 
-  btn.addEventListener('click', () => loadPartner(input.value.trim()));
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') loadPartner(input.value.trim());
+  // Update global search chip
+  const chip = document.getElementById('globalLoadedChip');
+  const chipName = document.getElementById('globalChipName');
+  const globalInput = document.getElementById('globalSearchInput');
+  chipName.textContent = name;
+  chip.classList.remove('hidden');
+  globalInput.value = '';
+  globalInput.style.display = 'none';
+
+  // Close all dropdowns
+  document.querySelectorAll('.search-dropdown').forEach(d => d.classList.add('hidden'));
+}
+
+// ── Init search on both inputs ──
+function initSearch() {
+  const heroInput = document.getElementById('heroSearchInput');
+  const heroDropdown = document.getElementById('heroSearchDropdown');
+  const globalInput = document.getElementById('globalSearchInput');
+  const globalDropdown = document.getElementById('globalSearchDropdown');
+
+  function wireSearch(input, dropdown) {
+    let activeIdx = -1;
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      activeIdx = -1;
+      if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+      renderDropdown(dropdown, searchEntities(q), q);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const items = dropdown.querySelectorAll('.search-result');
+      if (!items.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIdx = Math.min(activeIdx + 1, items.length - 1);
+        items.forEach((it, i) => it.classList.toggle('active', i === activeIdx));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIdx = Math.max(activeIdx - 1, 0);
+        items.forEach((it, i) => it.classList.toggle('active', i === activeIdx));
+      } else if (e.key === 'Enter' && activeIdx >= 0) {
+        e.preventDefault();
+        selectSearchResult(items[activeIdx]);
+      } else if (e.key === 'Escape') {
+        dropdown.classList.add('hidden');
+        input.blur();
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      setTimeout(() => dropdown.classList.add('hidden'), 200);
+    });
+
+    input.addEventListener('focus', () => {
+      const q = input.value.trim();
+      if (q.length >= 2) renderDropdown(dropdown, searchEntities(q), q);
+    });
+  }
+
+  wireSearch(heroInput, heroDropdown);
+  wireSearch(globalInput, globalDropdown);
+
+  // Global chip clear
+  document.getElementById('globalChipClear').addEventListener('click', () => {
+    clearLoadedPartner();
   });
 }
 
-// ── Quick-load from recent partner cards ──
+// ── Clear loaded partner (back to homepage) ──
+function clearLoadedPartner() {
+  const chip = document.getElementById('globalLoadedChip');
+  const globalInput = document.getElementById('globalSearchInput');
+  chip.classList.add('hidden');
+  globalInput.style.display = '';
+  globalInput.value = '';
+  globalInput.focus();
+  document.getElementById('partnerLoaded').classList.add('hidden');
+  document.getElementById('freHomepage').classList.remove('hidden');
+  setActiveNav('navHome');
+}
+
+// ── Keyboard shortcut: "/" focuses hero search ──
+function initKeyboardShortcut() {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+      e.preventDefault();
+      const hero = document.getElementById('heroSearchInput');
+      if (hero && !hero.closest('.hidden')) {
+        hero.focus();
+      } else {
+        document.getElementById('globalSearchInput').focus();
+      }
+    }
+  });
+}
+
+// ── Quick-load from partner cards ──
 function initPartnerCards() {
   document.querySelectorAll('.partner-card').forEach(card => {
     const handler = () => {
       const name = card.dataset.partner;
       const id = card.dataset.id;
       const type = card.dataset.type;
-      showPartnerView(name, type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID', id);
+      const idType = type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID';
+      showPartnerView(name, idType, id);
+
+      // Also update global chip
+      const chip = document.getElementById('globalLoadedChip');
+      const chipName = document.getElementById('globalChipName');
+      const globalInput = document.getElementById('globalSearchInput');
+      chipName.textContent = name;
+      chip.classList.remove('hidden');
+      globalInput.style.display = 'none';
     };
     card.addEventListener('click', handler);
     const btn = card.querySelector('.partner-load-quick');
     if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); handler(); });
   });
-}
-
-// ── Load partner by ID ──
-function loadPartner(idValue) {
-  if (!idValue) return;
-  const type = document.getElementById('idTypeDropdown').value;
-  const label = type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID';
-  // Simulate partner lookup
-  const fakeNames = {
-    '8834721': 'Contoso Partners',
-    '4419283': 'Fabrikam Inc.',
-    '5512903': 'Woodgrove Bank'
-  };
-  const name = fakeNames[idValue] || `Partner (${idValue})`;
-  showPartnerView(name, label, idValue);
 }
 
 // ── Show partner-loaded view ──
@@ -90,9 +253,7 @@ function showPartnerView(name, idType, id) {
 // ── Change partner (back to FRE) ──
 function initBannerChange() {
   document.getElementById('bannerChange').addEventListener('click', () => {
-    document.getElementById('partnerLoaded').classList.add('hidden');
-    document.getElementById('freHomepage').classList.remove('hidden');
-    setActiveNav('navHome');
+    clearLoadedPartner();
   });
 }
 
@@ -246,17 +407,17 @@ function initDismissibles() {
   }
 }
 
-/* ── Pinned / Recent partner toggle ── */
+/* ── Pinned / Recent / MPL partner toggle ── */
 function initPartnerViewToggle() {
   const btns = document.querySelectorAll('.toggle-btn');
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const target = btn.dataset.view; // "pinned" or "recent"
+      const target = btn.dataset.view;
+      const viewMap = { pinned: 'pinnedPartnersView', recent: 'recentPartnersView', mpl: 'mplPartnersView' };
       document.querySelectorAll('.partner-view').forEach(v => {
-        const viewKey = v.id === 'pinnedPartnersView' ? 'pinned' : 'recent';
-        v.classList.toggle('hidden', viewKey !== target);
+        v.classList.toggle('hidden', v.id !== viewMap[target]);
       });
     });
   });
@@ -272,6 +433,13 @@ function initAlertActions() {
       if (partner && id) {
         const idLabel = type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID';
         showPartnerView(partner, idLabel, id);
+
+        const chip = document.getElementById('globalLoadedChip');
+        const chipName = document.getElementById('globalChipName');
+        const globalInput = document.getElementById('globalSearchInput');
+        chipName.textContent = partner;
+        chip.classList.remove('hidden');
+        globalInput.style.display = 'none';
       }
     });
   });
