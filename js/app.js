@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initBannerChange();
   initDismissibles();
   initPartnerViewToggle();
-  initAlertActions();
   initPinButtons();
 });
 
@@ -253,20 +252,6 @@ function initPartnerViewToggle() {
 }
 
 /* ── Alert action buttons ── */
-function initAlertActions() {
-  document.querySelectorAll('.alert-action').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const partner = btn.dataset.partner;
-      const id = btn.dataset.id;
-      const type = btn.dataset.type;
-      if (partner && id) {
-        const idLabel = type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID';
-        showPartnerView(partner, idLabel, id);
-      }
-    });
-  });
-}
-
 /* ── Pin / Unpin partner cards ── */
 function initPinButtons() {
   document.querySelectorAll('.pin-btn').forEach(btn => {
