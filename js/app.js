@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   initGreeting();
-  initSearch();
+  initDropdown();
+  initPartnerLoad();
   initPartnerCards();
   initOppTabs();
   initBannerChange();
@@ -8,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initPartnerViewToggle();
   initAlertActions();
   initPinButtons();
-  initKeyboardShortcut();
 });
 
 // ── Greeting ──
@@ -18,195 +18,47 @@ function initGreeting() {
   document.getElementById('greeting').textContent = `Good ${period}, Varun`;
 }
 
-// ── Search data (simulated partner + tenant index) ──
-const searchIndex = [
-  { name: 'Contoso Partners', type: 'partner', id: '8834721', idType: 'PartnerOne ID', tenants: 47, initials: 'CP' },
-  { name: 'Fabrikam Inc.', type: 'partner', id: '4419283', idType: 'MPN ID', tenants: 22, initials: 'FI' },
-  { name: 'Woodgrove Bank', type: 'partner', id: '5512903', idType: 'PartnerOne ID', tenants: 31, initials: 'WB' },
-  { name: 'Adatum Corporation', type: 'partner', id: '7721054', idType: 'MPN ID', tenants: 15, initials: 'AC' },
-  { name: 'Lucerne Publishing', type: 'partner', id: '6630182', idType: 'PartnerOne ID', tenants: 9, initials: 'LP' },
-  { name: 'Datum Corp', type: 'partner', id: '3310247', idType: 'MPN ID', tenants: 38, initials: 'DC' },
-  { name: 'Contoso Ltd.', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-90412', initials: 'CL' },
-  { name: 'Northwind Traders', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-71823', initials: 'NT' },
-  { name: 'Adventure Works', type: 'tenant', parent: 'Fabrikam Inc.', parentId: '4419283', tpid: 'TPID-55091', initials: 'AW' },
-  { name: 'Alpine Ski House', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-62340', initials: 'AS' },
-  { name: 'Trey Research', type: 'tenant', parent: 'Fabrikam Inc.', parentId: '4419283', tpid: 'TPID-48712', initials: 'TR' },
-  { name: 'Relecloud Inc.', type: 'tenant', parent: 'Woodgrove Bank', parentId: '5512903', tpid: 'TPID-33901', initials: 'RI' },
-  { name: 'Bellows College', type: 'tenant', parent: 'Contoso Partners', parentId: '8834721', tpid: 'TPID-82156', initials: 'BC' },
-  { name: 'Fourth Coffee', type: 'tenant', parent: 'Adatum Corporation', parentId: '7721054', tpid: 'TPID-14509', initials: 'FC' },
-  { name: 'Litware Inc.', type: 'tenant', parent: 'Datum Corp', parentId: '3310247', tpid: 'TPID-67283', initials: 'LI' },
-  { name: 'Proseware Ltd.', type: 'tenant', parent: 'Lucerne Publishing', parentId: '6630182', tpid: 'TPID-20145', initials: 'PL' },
-];
-
-// ── Fuzzy search ──
-function searchEntities(query) {
-  if (!query || query.length < 2) return [];
-  const q = query.toLowerCase();
-  return searchIndex.filter(item => {
-    return item.name.toLowerCase().includes(q)
-      || item.id?.toLowerCase().includes(q)
-      || item.tpid?.toLowerCase().includes(q)
-      || item.parent?.toLowerCase().includes(q);
-  }).slice(0, 8);
-}
-
-// ── Highlight match ──
-function highlight(text, query) {
-  if (!query) return text;
-  const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) return text;
-  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + query.length) + '</mark>' + text.slice(idx + query.length);
-}
-
-// ── Render dropdown ──
-function renderDropdown(dropdown, results, query) {
-  if (results.length === 0) {
-    dropdown.innerHTML = `<div class="search-empty">No results for "${query}"<br><span style="font-size:11px;color:#b3b3b3">Try a partner name, tenant name, or ID</span></div>`;
-    dropdown.classList.remove('hidden');
-    return;
-  }
-
-  const partners = results.filter(r => r.type === 'partner');
-  const tenants = results.filter(r => r.type === 'tenant');
-  let html = '';
-
-  if (partners.length) {
-    html += '<div class="search-group-label">Partners</div>';
-    partners.forEach(p => {
-      html += `<div class="search-result" data-type="partner" data-name="${p.name}" data-id="${p.id}" data-id-type="${p.idType}">
-        <div class="search-result-avatar partner">${p.initials}</div>
-        <div class="search-result-info">
-          <div class="search-result-name">${highlight(p.name, query)}</div>
-          <div class="search-result-meta">${p.idType}: ${p.id} · ${p.tenants} tenants</div>
-        </div>
-        <span class="search-result-badge partner">Partner</span>
-      </div>`;
-    });
-  }
-
-  if (tenants.length) {
-    html += '<div class="search-group-label">Tenants</div>';
-    tenants.forEach(t => {
-      html += `<div class="search-result" data-type="tenant" data-name="${t.parent}" data-id="${t.parentId}" data-id-type="PartnerOne ID" data-tenant="${t.name}">
-        <div class="search-result-avatar tenant">${t.initials}</div>
-        <div class="search-result-info">
-          <div class="search-result-name">${highlight(t.name, query)}</div>
-          <div class="search-result-meta">under ${t.parent} · ${t.tpid}</div>
-        </div>
-        <span class="search-result-badge tenant">Tenant</span>
-      </div>`;
-    });
-  }
-
-  html += `<div class="search-footer"><kbd>↑</kbd> <kbd>↓</kbd> to navigate · <kbd>Enter</kbd> to select · <kbd>Esc</kbd> to close</div>`;
-  dropdown.innerHTML = html;
-  dropdown.classList.remove('hidden');
-
-  // Wire click handlers
-  dropdown.querySelectorAll('.search-result').forEach(el => {
-    el.addEventListener('click', () => selectSearchResult(el));
+// ── Dropdown placeholder toggle ──
+function initDropdown() {
+  const dropdown = document.getElementById('idTypeDropdown');
+  const input = document.getElementById('searchInput');
+  const placeholders = {
+    partnerone: 'Enter PartnerOne ID (Limit one at a time)',
+    mpn: 'Enter MPN ID (comma-separated, up to 200)'
+  };
+  dropdown.addEventListener('change', () => {
+    input.placeholder = placeholders[dropdown.value];
+    input.value = '';
+    input.focus();
   });
 }
 
-// ── Select a search result ──
-function selectSearchResult(el) {
-  const name = el.dataset.name;
-  const id = el.dataset.id;
-  const idType = el.dataset.idType;
-  showPartnerView(name, idType, id);
-  updateGlobalChip(name);
-  document.querySelectorAll('.search-dropdown').forEach(d => d.classList.add('hidden'));
-}
+// ── Load partner from hero picker ──
+function initPartnerLoad() {
+  const btn = document.getElementById('loadPartnerBtn');
+  const input = document.getElementById('searchInput');
 
-// ── Update global search chip state ──
-function updateGlobalChip(name) {
-  const chip = document.getElementById('globalLoadedChip');
-  const chipName = document.getElementById('globalChipName');
-  const globalInput = document.getElementById('globalSearchInput');
-  const kbd = document.querySelector('.global-kbd');
-  chipName.textContent = name;
-  chip.classList.remove('hidden');
-  globalInput.value = '';
-  globalInput.style.display = 'none';
-  if (kbd) kbd.style.display = 'none';
-}
-
-// ── Init search on global input only ──
-function initSearch() {
-  const globalInput = document.getElementById('globalSearchInput');
-  const globalDropdown = document.getElementById('globalSearchDropdown');
-
-  let activeIdx = -1;
-
-  globalInput.addEventListener('input', () => {
-    const q = globalInput.value.trim();
-    activeIdx = -1;
-    // Hide kbd hint when typing
-    const kbd = document.querySelector('.global-kbd');
-    if (kbd) kbd.style.display = q.length > 0 ? 'none' : '';
-    if (q.length < 2) { globalDropdown.classList.add('hidden'); return; }
-    renderDropdown(globalDropdown, searchEntities(q), q);
-  });
-
-  globalInput.addEventListener('keydown', (e) => {
-    const items = globalDropdown.querySelectorAll('.search-result');
-    if (!items.length) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      activeIdx = Math.min(activeIdx + 1, items.length - 1);
-      items.forEach((it, i) => it.classList.toggle('active', i === activeIdx));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      activeIdx = Math.max(activeIdx - 1, 0);
-      items.forEach((it, i) => it.classList.toggle('active', i === activeIdx));
-    } else if (e.key === 'Enter' && activeIdx >= 0) {
-      e.preventDefault();
-      selectSearchResult(items[activeIdx]);
-    } else if (e.key === 'Escape') {
-      globalDropdown.classList.add('hidden');
-      globalInput.blur();
-    }
-  });
-
-  globalInput.addEventListener('blur', () => {
-    setTimeout(() => globalDropdown.classList.add('hidden'), 200);
-  });
-
-  globalInput.addEventListener('focus', () => {
-    const q = globalInput.value.trim();
-    if (q.length >= 2) renderDropdown(globalDropdown, searchEntities(q), q);
-  });
-
-  // Global chip clear
-  document.getElementById('globalChipClear').addEventListener('click', () => {
-    clearLoadedPartner();
+  btn.addEventListener('click', () => loadPartner(input.value.trim()));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loadPartner(input.value.trim());
   });
 }
 
-// ── Clear loaded partner (back to homepage) ──
-function clearLoadedPartner() {
-  const chip = document.getElementById('globalLoadedChip');
-  const globalInput = document.getElementById('globalSearchInput');
-  const kbd = document.querySelector('.global-kbd');
-  chip.classList.add('hidden');
-  globalInput.style.display = '';
-  globalInput.value = '';
-  if (kbd) kbd.style.display = '';
-  globalInput.focus();
-  document.getElementById('partnerLoaded').classList.add('hidden');
-  document.getElementById('freHomepage').classList.remove('hidden');
-  setActiveNav('navHome');
-}
-
-// ── Keyboard shortcut: "/" focuses global search ──
-function initKeyboardShortcut() {
-  document.addEventListener('keydown', (e) => {
-    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
-      e.preventDefault();
-      document.getElementById('globalSearchInput').focus();
-    }
-  });
+// ── Load partner by ID ──
+function loadPartner(idValue) {
+  if (!idValue) return;
+  const type = document.getElementById('idTypeDropdown').value;
+  const label = type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID';
+  const fakeNames = {
+    '8834721': 'Contoso Partners',
+    '4419283': 'Fabrikam Inc.',
+    '5512903': 'Woodgrove Bank',
+    '7721054': 'Adatum Corporation',
+    '6630182': 'Lucerne Publishing',
+    '3310247': 'Datum Corp'
+  };
+  const name = fakeNames[idValue] || `Partner (${idValue})`;
+  showPartnerView(name, label, idValue);
 }
 
 // ── Quick-load from partner cards ──
@@ -218,7 +70,6 @@ function initPartnerCards() {
       const type = card.dataset.type;
       const idType = type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID';
       showPartnerView(name, idType, id);
-      updateGlobalChip(name);
     };
     card.addEventListener('click', handler);
     const btn = card.querySelector('.partner-load-quick');
@@ -242,7 +93,9 @@ function showPartnerView(name, idType, id) {
 // ── Change partner (back to FRE) ──
 function initBannerChange() {
   document.getElementById('bannerChange').addEventListener('click', () => {
-    clearLoadedPartner();
+    document.getElementById('partnerLoaded').classList.add('hidden');
+    document.getElementById('freHomepage').classList.remove('hidden');
+    setActiveNav('navHome');
   });
 }
 
@@ -409,7 +262,6 @@ function initAlertActions() {
       if (partner && id) {
         const idLabel = type === 'partnerone' ? 'PartnerOne ID' : 'MPN ID';
         showPartnerView(partner, idLabel, id);
-        updateGlobalChip(partner);
       }
     });
   });
