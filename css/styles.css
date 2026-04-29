@@ -306,10 +306,52 @@ body {
   font-weight: 600; color: #424242; width: 45%;
 }
 .flyout-info-table td:last-child { color: #242424; }
+.flyout-info-table thead td {
+  font-weight: 600; color: #424242; border-bottom: 2px solid #e0e0e0;
+}
+
+.flyout-subs-table td:first-child { width: auto; }
+.flyout-promos-table td { font-size: 12px; padding: 12px 8px 12px 0; }
+.flyout-promos-table td:first-child { width: auto; max-width: 220px; white-space: normal; }
 
 .flyout-section-title {
   font-size: 15px; font-weight: 600; margin: 20px 0 12px;
   padding-top: 12px; border-top: 1px solid #e0e0e0;
+}
+
+.flyout-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px; padding: 6px 0;
+}
+.flyout-toolbar-btn {
+  font-size: 12px; font-family: inherit; color: #424242;
+  background: none; border: none; cursor: pointer; padding: 4px 8px;
+  border-radius: 4px;
+}
+.flyout-toolbar-btn:hover { background: #f0f0f0; color: #0078d4; }
+.flyout-toolbar-spacer { flex: 1; }
+.flyout-search {
+  font-size: 12px; font-family: inherit; padding: 4px 8px;
+  border: 1px solid #d1d1d1; border-radius: 4px; width: 120px;
+}
+
+/* Recommendation box (screenshot 5) */
+.flyout-recommendation-box {
+  margin: 16px 0; padding: 14px 16px;
+  border: 1px solid #e0e0e0; border-radius: 8px;
+  background: #fafafa;
+}
+.flyout-rec-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; font-size: 14px;
+}
+.flyout-recommendation-box p { font-size: 13px; color: #424242; }
+
+/* Preview badge */
+.preview-badge {
+  font-size: 10px; font-weight: 700; color: #e65100;
+  background: #fff3e0; padding: 2px 8px; border-radius: 4px;
+  margin-left: 8px; vertical-align: middle;
 }
 
 /* Flyout feedback bar (thumbs up/down) */
