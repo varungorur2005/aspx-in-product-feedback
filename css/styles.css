@@ -133,37 +133,6 @@ body {
 }
 .whats-new-dismiss:hover { background: #f0f0f0; color: #616161; }
 
-/* ── #1 + #2: Meta Bar (Subsidiary + Data Freshness) ── */
-.meta-bar {
-  display: flex; align-items: center; justify-content: center;
-  gap: 24px; padding: 0; margin-bottom: 4px;
-}
-.meta-item {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 12px; color: #616161;
-}
-.meta-item strong { color: #242424; font-weight: 600; }
-.meta-tooltip-wrap { position: relative; display: inline-flex; }
-.meta-info-btn {
-  background: none; border: none; color: #999;
-  cursor: pointer; display: flex; align-items: center;
-  border-radius: 50%; padding: 2px;
-}
-.meta-info-btn:hover { color: #0078d4; }
-.meta-tooltip {
-  display: none; position: absolute; bottom: calc(100% + 8px);
-  left: 50%; transform: translateX(-50%);
-  background: #333; color: #fff; font-size: 11px; line-height: 1.5;
-  padding: 8px 12px; border-radius: 6px; width: 260px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10;
-}
-.meta-tooltip::after {
-  content: ''; position: absolute; top: 100%; left: 50%;
-  transform: translateX(-50%); border: 6px solid transparent;
-  border-top-color: #333;
-}
-.meta-tooltip-wrap:hover .meta-tooltip { display: block; }
-
 /* ── #5: Pinned/Recent toggle ── */
 .section-heading-row {
   display: flex; align-items: center; justify-content: space-between;
