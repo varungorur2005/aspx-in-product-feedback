@@ -3,47 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASPX - In-Product Feedback Prototype</title>
+  <title>ASPX - AI Business Solutions & Security Insights</title>
   <link rel="stylesheet" href="css/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Top navigation bar -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <svg class="microsoft-logo" width="20" height="20" viewBox="0 0 21 21">
+        <rect x="0" y="0" width="10" height="10" fill="#f25022"/>
+        <rect x="11" y="0" width="10" height="10" fill="#7fba00"/>
+        <rect x="0" y="11" width="10" height="10" fill="#00a4ef"/>
+        <rect x="11" y="11" width="10" height="10" fill="#ffb900"/>
+      </svg>
+      <span class="nav-title">Insights</span>
+      <span class="nav-separator">|</span>
+      <span class="nav-subtitle">Growth Opportunities <sup style="font-size:9px;color:#616161;">AI Business Solutions & Security</sup></span>
+    </div>
+    <div class="nav-right">
+      <button class="nav-feedback-global" id="globalFeedbackBtn" title="Give Feedback">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 12.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM7.25 5h1.5v4h-1.5V5zm0 5h1.5v1.5h-1.5V10z"/></svg>
+        Give Feedback
+      </button>
+      <button class="nav-help" title="Help & readiness">?</button>
+      <div class="nav-avatar" title="Varun Gorur">VG</div>
+    </div>
+  </nav>
 
-  <!-- ═══ BACKDROP: ASPX Growth Opportunities page (screenshot mockup) ═══ -->
-  <div class="backdrop">
-    <img src="img/aspx-backdrop.png" alt="ASPX Growth Opportunities" class="backdrop-img" />
-    <div class="backdrop-overlay"></div>
-  </div>
+  <!-- Left sidebar navigation -->
+  <div class="app-layout">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link" id="navHome">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2L3 9h2v7h4v-5h2v5h4V9h2L10 2z"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="#" class="sidebar-link active" id="navGrowth">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M14 4l1.71 1.71-3.64 3.64-3-3L2 13.41 3.41 15l5.66-5.66 3 3 4.7-4.7L18.5 9.5V4H14z"/></svg>
+          <span>Growth Opportunities</span>
+        </a>
+        <div class="sidebar-divider"></div>
+        <a href="#" class="sidebar-link disabled coming-soon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm3.5 11h-4V6h1.5v5.5H13.5V13z"/></svg>
+          <span>MCI Performance</span>
+          <span class="badge-soon">Soon</span>
+        </a>
+        <a href="#" class="sidebar-link disabled coming-soon">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2L4 17.5l.53.53L10 15.5l5.47 2.53.53-.53L10 2z"/></svg>
+          <span>FastTrack Referrals</span>
+          <span class="badge-soon">Soon</span>
+        </a>
+      </nav>
+    </aside>
 
-  <!-- ═══ POPUP: In-Product Feedback Prototype ═══ -->
-  <div class="popup-container">
-    <div class="popup-window">
+    <!-- Main content area -->
+    <main class="main-content main-content-wide">
 
-      <!-- Popup Header -->
-      <div class="popup-header">
-        <div class="popup-header-left">
-          <svg width="20" height="20" viewBox="0 0 21 21">
-            <rect x="0" y="0" width="10" height="10" fill="#f25022"/>
-            <rect x="11" y="0" width="10" height="10" fill="#7fba00"/>
-            <rect x="0" y="11" width="10" height="10" fill="#00a4ef"/>
-            <rect x="11" y="11" width="10" height="10" fill="#ffb900"/>
-          </svg>
-          <span class="popup-title">Insights</span>
-          <span class="popup-separator">|</span>
-          <span class="popup-subtitle">Growth Opportunities <sup style="font-size:9px;color:#616161;">AI Business Solutions & Security</sup></span>
-        </div>
-        <div class="popup-header-right">
-          <button class="nav-feedback-global" id="globalFeedbackBtn" title="Give Feedback">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 12.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zM7.25 5h1.5v4h-1.5V5zm0 5h1.5v1.5h-1.5V10z"/></svg>
-            Give Feedback
-          </button>
-          <button class="nav-help" title="Help & readiness">?</button>
-          <div class="nav-avatar" title="Varun Gorur">VG</div>
-        </div>
-      </div>
-
-      <!-- Popup Body -->
-      <div class="popup-body">
+      <!-- Growth Opportunities View (main ASPX view) -->
+      <div class="aspx-view" id="aspxView">
 
         <!-- Opportunity Tabs -->
         <div class="opp-tabs-bar">
@@ -58,11 +76,11 @@
         <!-- KPI Tiles -->
         <div class="kpi-row" id="kpiRow"></div>
 
-        <!-- Table Toolbar -->
+        <!-- Table Toolbar (matching screenshot 1) -->
         <div class="table-toolbar-aspx">
           <div class="toolbar-left">
             <button class="toolbar-btn" id="downloadBtn">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v9.5m0 0L5 7.5m3 3L11 7.5M3 13h10"/><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               Download
             </button>
             <button class="toolbar-btn" id="dataDictBtn">
@@ -135,19 +153,23 @@
           <svg width="14" height="14" viewBox="0 0 16 16" fill="#0078d4"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.75 10.15l-3-3 1.06-1.06L7.25 9.03l3.44-3.44 1.06 1.06-4.5 4.5z"/></svg>
           Row selected — "Give Feedback" is now enabled
         </div>
+      </div>
 
-      </div><!-- /popup-body -->
-    </div><!-- /popup-window -->
-  </div><!-- /popup-container -->
+    </main>
+  </div>
 
   <!-- ═══ FLYOUT PANELS ═══ -->
+
+  <!-- Flyout: Tenant Details (Screenshot 2) -->
   <div class="flyout-overlay hidden" id="flyoutOverlay"></div>
   <aside class="flyout-panel hidden" id="flyoutPanel">
     <div class="flyout-header">
       <h2 class="flyout-title" id="flyoutTitle">Tenant Details</h2>
       <button class="flyout-close" id="flyoutClose">✕</button>
     </div>
-    <div class="flyout-body" id="flyoutBody"></div>
+    <div class="flyout-body" id="flyoutBody">
+      <!-- Dynamic content -->
+    </div>
     <div class="flyout-feedback-bar">
       <span class="flyout-feedback-label">Was this information helpful?</span>
       <button class="flyout-thumb" data-vote="up" title="Thumbs up">
@@ -170,26 +192,39 @@
       <button class="ocv-close" id="ocvClose">✕</button>
     </div>
     <div class="ocv-body">
+      <!-- Context section (pre-filled) -->
       <div class="ocv-section ocv-context" id="ocvContext">
         <div class="ocv-context-label">Feedback context (auto-captured)</div>
-        <div class="ocv-context-details" id="ocvContextDetails"></div>
+        <div class="ocv-context-details" id="ocvContextDetails">
+          <!-- Dynamically filled -->
+        </div>
       </div>
+
+      <!-- Feedback reason -->
       <div class="ocv-section">
         <label class="ocv-label">Feedback category</label>
         <div class="ocv-reason-badge" id="ocvReasonBadge">Incorrect data</div>
       </div>
+
+      <!-- Pre-captured columns (so partner knows they don't have to re-enter) -->
       <div class="ocv-section" id="ocvColumnsSection">
         <label class="ocv-label">Data captured from selected row</label>
-        <div class="ocv-columns-grid" id="ocvColumnsGrid"></div>
+        <div class="ocv-columns-grid" id="ocvColumnsGrid">
+          <!-- Dynamically filled with column/value pairs -->
+        </div>
         <div class="ocv-columns-note">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="#107c10"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.75 10.15l-3-3 1.06-1.06L7.25 9.03l3.44-3.44 1.06 1.06-4.5 4.5z"/></svg>
           You don't need to re-enter this data — it's automatically attached to your feedback.
         </div>
       </div>
+
+      <!-- User feedback input -->
       <div class="ocv-section">
         <label class="ocv-label" for="ocvComments">Tell us more (optional)</label>
         <textarea class="ocv-textarea" id="ocvComments" rows="4" placeholder="Describe the issue in more detail. For example: 'The Copilot PAU shows 245 but our actual paid seats are 310...'"></textarea>
       </div>
+
+      <!-- Contact consent -->
       <div class="ocv-section ocv-consent">
         <label class="ocv-checkbox-label">
           <input type="checkbox" id="ocvConsent" checked>
